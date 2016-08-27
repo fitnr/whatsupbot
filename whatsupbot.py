@@ -78,9 +78,8 @@ def main():
 
             user = bot if args.sender is None else args.sender
             api = tbu.API(args, screen_name=user, config_file=args.config_file)
-
             hours = api.config.get('whatsupbot', {}).get('hours', args.hours)
-            message = whatsup(api, bot, hours, sender=args.sender)
+            message = whatsup(api, bot, hours, sender=user)
 
             if message:
                 notify(api, message, args.recipient)
