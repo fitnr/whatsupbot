@@ -9,44 +9,51 @@ except ImportError:
 
 
 def last_tweet(api, screen_name):
-    '''Hours since last tweet. Returns float.'''
+    '''Hours since last tweet. Returns float/int.'''
     try:
         created_at = api.user_timeline(screen_name, count=1)[0].created_at
         now = datetime.now()
 
         return (now - created_at).total_seconds() / 3600.
+
     except (TypeError, IndexError):
-        return False
+        return -1
 
 
-def notify(api, screen_name, elapsed=False):
-    if elapsed:
-        text = "I'm not working. It's been {} hours since my last tweet. Fix me!".format(int(elapsed))
+def notify(api, text, recipient=None):
+    if recipient:
+        api.send_direct_message(screen_name=recipient, text=text)
     else:
-        text = "I'm not working. Fix me!"
-
-    api.send_direct_message(screen_name=screen_name, text=text)
+        print(text)
 
 
-def whatsup(api, screen_name, hours, recipient=None):
+def whatsup(api, screen_name, hours, sender=None):
     elapsed = last_tweet(api, screen_name)
 
-    if elapsed > hours:
-        if recipient:
-            notify(api, recipient, elapsed)
+    if elapsed == -1:
+        if sender == screen_name:
+            message = "My timeline isn't showing up in the Twitter API. Can you check on me?"
         else:
-            print('no tweets from @{} in the last {} hours'.format(screen_name, int(elapsed)))
+            message = "@{}'s timeline isn't showing up in the Twitter API. Look into that when you get a chance".format(screen_name)
+
+    elif elapsed > hours:
+        if sender == screen_name:
+            message = "I'm not working. It's been more than {} hours since my last tweet. Fix me!".format(int(elapsed))
+        else:
+            message = 'No tweets from @{} in more than {} hours'.format(screen_name, int(elapsed))
+
+        return message
 
 
 def main():
     parser = argparse.ArgumentParser()
-
     parser.add_argument('--screen_name', default=None, required=False, help='screen name to check')
+    parser.add_argument('--from', dest='sender', default=None, required=False,
+                        help='account that will send DM notifications (defaults to screen_name)')
     parser.add_argument('--hours', type=int, default=24,
                         help="Gaps of this many hours are a problem (default: 24)")
-    parser.add_argument('--notify', dest='recipient', metavar='USER', type=str, default=None,
+    parser.add_argument('--to', dest='recipient', metavar='USER', type=str, default=None,
                         help='user to notify when screen_name is down')
-
     try:
         tbu
         parser.add_argument('-c', '--config', dest='config_file', metavar='PATH', default=None, type=str,
@@ -62,26 +69,33 @@ def main():
     args = parser.parse_args()
 
     if getattr(args, 'config_file'):
-        bots = tbu.confighelper.parse(args.config_file).get('users').keys()
+        del args.screen_name
 
-        for bot in bots:
-            api = tbu.API(screen_name=bot, config_file=args.config_file)
-
-            if api.config.get('whatsupbot') is False:
+        conf = tbu.confighelper.parse(args.config_file)
+        for bot, attrs in conf.get('users', {}).items():
+            if attrs.get('whatsupbot') is False:
                 continue
 
+            user = bot if args.sender is None else args.sender
+            api = tbu.API(args, screen_name=user, config_file=args.config_file)
+
             hours = api.config.get('whatsupbot', {}).get('hours', args.hours)
-            whatsup(api, bot, hours, args.recipient)
+            message = whatsup(api, bot, hours, sender=args.sender)
+
+            if message:
+                notify(api, message, args.recipient)
 
     else:
         try:
             api = tbu.API(args)
         except NameError:
-            auth = tweepy.OAuthHandler(args.consumer_key, args.consumer_secret) 
+            auth = tweepy.OAuthHandler(args.consumer_key, args.consumer_secret)
             auth.set_access_token(args.key, args.secret)
             api = tweepy.API(auth)
 
-        whatsup(api, args.screen_name, args.hours, args.recipient)
+        message = whatsup(api, args.screen_name, args.hours, sender=args.sender)
+        if message:
+            notify(api, message, args.recipient)
 
 if __name__ == '__main__':
     main()

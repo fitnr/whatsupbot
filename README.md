@@ -6,7 +6,7 @@ Check if your Twitter bots are running, get a DM if they aren't.
 
 Send a DM to @yourname if @examplebot hasn't tweeted in 13 hours.
 ````
-python whatsupbot.py --screen_name examplebot --hours 13 --notify yourname
+python whatsupbot.py --screen_name examplebot --hours 13 --to yourname
 ```
 
 The DM will come from @examplebot, and it will say something like "I'm not working. It's been 14 hours since my last tweet. Fix me!". If everything is running fine, nothing will happen!
@@ -26,7 +26,14 @@ Then copy `whatsupbot.py` to somewhere handy.
 
 Install with a cron job, which might look something like this:
 ```
-5 * * * * python $HOME/whatsupbot.py --screen_name botname --notify yourname --consumer-key [etc]
+5 * * * * python path/to/whatsupbot.py --screen_name botname --to yourname --consumer-key [etc]
+```
+
+## Using a third party account
+
+Wait, you ask - what if my bot has been suspended, then it can't send me DMs! That's a good point. If you would like another account to do the DM sending, use the `--from` option:
+```
+python whatsupbot.py --screen_name botname --from thirdparty --to yourname --consumer-key ... --consumer-secret ... --key ... --secret ...
 ```
 
 ## Checking lots of bots
@@ -37,8 +44,10 @@ Use the `whatsupbot` key to either ignore bots or customize the hours limit on e
 
 Then run:
 ```
-python whatsupbot.py --notify yourname --config config.yaml
+python whatsupbot.py --to yourname --config config.yaml
 ```
+
+The `--from` flag also works with this set-up. If the "from" account is in the bots.yaml file, its authentication keys will be used.
 
 ## Acknowledgments
 
