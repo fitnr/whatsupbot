@@ -35,7 +35,7 @@ def whatsup(api, screen_name, hours, recipient=None):
         if recipient:
             notify(api, recipient, elapsed)
         else:
-            print('no tweets from', screen_name, 'in the last', int(elapsed), 'hours')
+            print('no tweets from @{} in the last {} hours'.format(screen_name, int(elapsed)))
 
 
 def main():
