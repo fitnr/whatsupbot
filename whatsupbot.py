@@ -15,7 +15,7 @@ def last_tweet(api, screen_name):
         created_at = api.user_timeline(screen_name, count=1)[0].created_at
         logging.getLogger('whatsupbot').debug('@%s: %s', screen_name, created_at)
 
-        now = datetime.now()
+        now = datetime.utcnow()
 
         return (now - created_at).total_seconds() / 3600.
 
