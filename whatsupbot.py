@@ -27,8 +27,9 @@ def notify(api, text, recipient=None):
         print(text)
 
 
-def whatsup(api, screen_name, hours, sender=None):
+def whatsup(api, screen_name, hours, sender=None, confirm=False):
     elapsed = last_tweet(api, screen_name)
+    message = ''
 
     if elapsed == -1:
         if sender == screen_name:
@@ -42,7 +43,13 @@ def whatsup(api, screen_name, hours, sender=None):
         else:
             message = 'No tweets from @{} in more than {} hours'.format(screen_name, int(elapsed))
 
-        return message
+    elif confirm:
+        if sender == screen_name:
+            message = "It's been {} hours since my last tweet. All is well!".format(int(elapsed))
+        else:
+            message = 'Just letting you know that @{} last tweeted {} hours ago'.format(screen_name, int(elapsed))
+
+    return message
 
 
 def main():
@@ -54,6 +61,10 @@ def main():
                         help="Gaps of this many hours are a problem (default: 24)")
     parser.add_argument('--to', dest='recipient', metavar='USER', type=str, default=None,
                         help='user to notify when screen_name is down')
+
+    parser.add_argument('--confirm', action='store_true',
+                        help='Always send message with the time of the most recent tweet')
+
     try:
         tbu
         parser.add_argument('-c', '--config', dest='config_file', metavar='PATH', default=None, type=str,
@@ -79,7 +90,7 @@ def main():
             user = bot if args.sender is None else args.sender
             api = tbu.API(args, screen_name=user, config_file=args.config_file)
             hours = api.config.get('whatsupbot', {}).get('hours', args.hours)
-            message = whatsup(api, bot, hours, sender=user)
+            message = whatsup(api, bot, hours, sender=user, confirm=args.confirm)
 
             if message:
                 notify(api, message, args.recipient)
@@ -92,7 +103,7 @@ def main():
             auth.set_access_token(args.key, args.secret)
             api = tweepy.API(auth)
 
-        message = whatsup(api, args.screen_name, args.hours, sender=args.sender)
+        message = whatsup(api, args.screen_name, args.hours, sender=args.sender, confirm=args.confirm)
         if message:
             notify(api, message, args.recipient)
 
