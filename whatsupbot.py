@@ -35,7 +35,8 @@ def whatsup(api, screen_name, hours, sender=None, confirm=False):
         if sender == screen_name:
             message = "My timeline isn't showing up in the Twitter API. Can you check on me?"
         else:
-            message = "@{}'s timeline isn't showing up in the Twitter API. Look into that when you get a chance".format(screen_name)
+            message = ("@{}'s timeline isn't showing up in the Twitter API. "
+                       "Look into that when you get a chance").format(screen_name)
 
     elif elapsed > hours:
         if sender == screen_name:
@@ -60,7 +61,7 @@ def main():
     parser.add_argument('--hours', type=int, default=24,
                         help="Gaps of this many hours are a problem (default: 24)")
     parser.add_argument('--to', dest='recipient', metavar='USER', type=str, default=None,
-                        help='user to notify when screen_name is down')
+                        help='user to notify when screen_name is down. If omitted, prints to stdout')
 
     parser.add_argument('--confirm', action='store_true',
                         help='Always send message with the time of the most recent tweet')
@@ -68,7 +69,7 @@ def main():
     try:
         tbu
         parser.add_argument('-c', '--config', dest='config_file', metavar='PATH', default=None, type=str,
-                            help='bots config file (json or yaml). All bots in the file will be checked.')
+                            help='bots config file (json or yaml). By default, all accounts in the file will be checked.')
     except NameError:
         pass
 
