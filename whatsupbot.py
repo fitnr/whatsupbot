@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+import logging
 import argparse
 from datetime import datetime
 try:
@@ -12,6 +13,8 @@ def last_tweet(api, screen_name):
     '''Hours since last tweet. Returns float/int.'''
     try:
         created_at = api.user_timeline(screen_name, count=1)[0].created_at
+        logging.getLogger('whatsupbot').debug('@%s: %s', screen_name, created_at)
+
         now = datetime.now()
 
         return (now - created_at).total_seconds() / 3600.
@@ -29,6 +32,7 @@ def notify(api, text, recipient=None):
 
 def whatsup(api, screen_name, hours, sender=None, confirm=False):
     elapsed = last_tweet(api, screen_name)
+    logging.getLogger('whatsupbot').debug('@%s elapsed: %s', screen_name, elapsed)
     message = ''
 
     if elapsed == -1:
@@ -67,9 +71,11 @@ def main():
                         help='Always send message with the time of the most recent tweet')
 
     try:
-        tbu
+        logger = tbu.args.add_logger('whatsupbot')
         parser.add_argument('-c', '--config', dest='config_file', metavar='PATH', default=None, type=str,
                             help='bots config file (json or yaml). By default, all accounts in the file will be checked.')
+        parser.add_argument('-v', '--verbose', action='store_true')
+
     except NameError:
         pass
 
@@ -83,9 +89,13 @@ def main():
     if getattr(args, 'config_file'):
         del args.screen_name
 
+        if args.verbose:
+            logger.setLevel(logging.DEBUG)
+
         conf = tbu.confighelper.parse(args.config_file)
         for bot, attrs in conf.get('users', {}).items():
             if attrs.get('whatsupbot') is False:
+                logger.debug('Ignoring @%s', bot)
                 continue
 
             user = bot if args.sender is None else args.sender
@@ -94,6 +104,7 @@ def main():
             message = whatsup(api, bot, hours, sender=user, confirm=args.confirm)
 
             if message:
+                logger.debug('writing to %s about @%s', args.recipient, bot)
                 notify(api, message, args.recipient)
 
     else:
@@ -106,6 +117,7 @@ def main():
 
         message = whatsup(api, args.screen_name, args.hours, sender=args.sender, confirm=args.confirm)
         if message:
+            logging.debug('writing to %s', args.recipient)
             notify(api, message, args.recipient)
 
 if __name__ == '__main__':
