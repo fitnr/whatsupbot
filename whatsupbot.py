@@ -23,11 +23,11 @@ def last_tweet(api, screen_name):
         return -1
 
 
-def notify(api, text, recipient=None):
+def notify(api, subject, text, recipient=None):
     if recipient:
         api.send_direct_message(screen_name=recipient, text=text)
     else:
-        print(text)
+        print('@{}: {}'.format(subject, text))
 
 
 def whatsup(api, screen_name, hours, sender=None, confirm=False):
@@ -105,7 +105,7 @@ def main():
 
             if message:
                 logger.debug('writing to %s about @%s', args.recipient, bot)
-                notify(api, message, args.recipient)
+                notify(api, bot, message, args.recipient)
 
     else:
         try:
@@ -118,7 +118,7 @@ def main():
         message = whatsup(api, args.screen_name, args.hours, sender=args.sender, confirm=args.confirm)
         if message:
             logging.debug('writing to %s', args.recipient)
-            notify(api, message, args.recipient)
+            notify(api, args.screen_name, message, args.recipient)
 
 if __name__ == '__main__':
     main()
