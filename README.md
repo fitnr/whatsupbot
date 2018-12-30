@@ -7,7 +7,7 @@ Check if your Twitter bots are running, get a DM if they aren't.
 Send a DM to @yourname if @examplebot hasn't tweeted in 13 hours.
 ````
 python whatsupbot.py --screen_name examplebot --hours 13 --to yourname
-```
+````
 
 The DM will come from @examplebot, and it will say something like "I'm not working. It's been 14 hours since my last tweet. Fix me!". If everything is running fine, nothing will happen!
 
@@ -51,4 +51,4 @@ The `--from` flag also works with this set-up. If the "from" account is in the b
 
 ## Acknowledgments
 
-Thanks to [mattlaschneider](https://github.com/mattlaschneider) for the [https://twitter.com/urbotbroke](urbotbroke) code, and to all the fine friendly folks at #botALLY for being fine friendly folks.
+Thanks to [mattlaschneider](https://github.com/mattlaschneider) for the [urbotbroke](https://twitter.com/urbotbroke) code, and to all the fine friendly folks at #botALLY for being fine friendly folks.
