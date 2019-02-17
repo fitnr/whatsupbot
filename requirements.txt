@@ -1,1 +1,1 @@
-twitter_bot_utils >= 0.11.4
+TwitterAPI >= 2.5.9
