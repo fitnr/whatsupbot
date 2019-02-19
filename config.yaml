@@ -1,24 +1,24 @@
 ---
 apps:
     sample_app_name:
-        consumer_key: If it's the Captain's Mess, let him clean it up.
-        consumer_secret: Gee, ain't I a stinker
+        consumer_key: a1b2c3
+        consumer_secret: d4e5f6
+    another_app:
+        consumer_key: e7f8g9
+        consumer_secret: h0i1j2
 
 users:
     sample_bot_name:
-        key: Of course you realize this means war
-        secret: I bet you say that to all the wabbits
+        key: 123-abc
+        secret: xyz
         app: sample_app_name
-
-
         # check that this bot has tweeted in the last 10 hours
         whatsupbot:
             hours: 10
     
     super_secret_bot:
-        key: For shame, doc. Hunting rabbits with an elephant gun
-        secret: I knew I shoulda taken that left turn at Albuquerque
+        key: 999-mno
+        secret: uvw999
         app: sample_app_name
-
         # whats up bot will ignore this bot
         whatsupbot: false

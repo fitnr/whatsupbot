@@ -38,7 +38,7 @@ python whatsupbot.py --screen_name botname --from thirdparty --to yourname --con
 
 ## Checking lots of bots
 
-To check lots of bots at once, create a config file, following the format in `config.yaml` (the file can also be JSON, if you prefer). This also gives you a handy place to put your authentication tokens.
+To check lots of bots at once, create a config file, following the format in `config.yaml` (the file can also be JSON, if you prefer). This also gives you a handy place to put your authentication tokens. An example `config.yaml` file is in the repository (json works too).
 
 Use the `whatsupbot` key to either ignore bots or customize the hours limit on each bot.
 
